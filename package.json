@@ -4,14 +4,22 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "npm run kill-ports && rm -rf .next/dev/lock && next dev",
+    "kill-ports": "lsof -ti :3000,3001 | xargs kill -9 2>/dev/null || true",
+    "clean": "rm -rf .next node_modules package-lock.json && npm install",
+    "fix": "npm run kill-ports && rm -rf .next/dev/lock && rm -rf .next/cache",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.34.1",
+    "lucide-react": "^0.574.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
