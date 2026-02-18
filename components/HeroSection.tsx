@@ -14,9 +14,36 @@ export default function HeroSection() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Animation variants for staggered reveal
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.18,
+                delayChildren: 0.4
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 1.2,
+                ease: [0.22, 1, 0.36, 1] as [number, number, number, number]
+            }
+        }
+    };
+
     return (
-        <section
+        <motion.section
             id="hero"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
             style={{
                 height: "100vh",
                 background: "#0D0D0D",
@@ -25,6 +52,7 @@ export default function HeroSection() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                willChange: "opacity"
             }}
         >
             <style>{`
@@ -59,9 +87,17 @@ export default function HeroSection() {
 
             {/* LEFT FLOATING PHOTO */}
             <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
+                initial={{ opacity: 0, x: -40, y: "-50%" }}
+                animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: ["-52%", "-48%", "-52%"]
+                }}
+                transition={{
+                    opacity: { duration: 1.2, delay: 0.8 },
+                    x: { duration: 1.2, delay: 0.8 },
+                    y: { duration: 12, repeat: Infinity, ease: "easeInOut" }
+                }}
                 className="floating-photo"
                 style={{
                     position: "absolute",
@@ -74,6 +110,7 @@ export default function HeroSection() {
                     overflow: "hidden",
                     boxShadow: "0 32px 64px rgba(0,0,0,0.6)",
                     zIndex: 5,
+                    willChange: "transform"
                 }}
             >
                 <Image
@@ -87,9 +124,9 @@ export default function HeroSection() {
 
             {/* CENTER CARD */}
             <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.3 }}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
                 className="center-card"
                 style={{
                     width: "520px",
@@ -103,164 +140,198 @@ export default function HeroSection() {
                     boxShadow: "0 40px 80px rgba(0,0,0,0.5)",
                     zIndex: 10,
                     boxSizing: "border-box",
+                    willChange: "transform"
                 }}
             >
-                <Image
-                    src="/images/logo.svg"
-                    alt="Flames n Spirits"
-                    width={110}
-                    height={110}
-                    style={{ objectFit: "contain", margin: "0 auto" }}
-                />
-
-                {/* Thin gold rule */}
-                <div
-                    style={{
-                        width: "48px",
-                        height: "1px",
-                        background: "#C9A84C",
-                        margin: "16px auto",
-                    }}
-                />
-
-                {/* Tagline */}
-                <p
-                    className="tagline"
-                    style={{
-                        fontFamily: "var(--font-cormorant)",
-                        fontSize: "22px",
-                        color: "rgba(245,237,214,0.7)",
-                        fontStyle: "italic",
-                        margin: "0 0 8px 0",
-                    }}
+                {/* Floating motion wrapper for the card body */}
+                <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 >
-                    Where Darkness Tastes Golden.
-                </p>
+                    <motion.div variants={itemVariants}>
+                        <Image
+                            src="/images/logo.svg"
+                            alt="Flames n Spirits"
+                            width={110}
+                            height={110}
+                            style={{ objectFit: "contain", margin: "0 auto" }}
+                        />
+                    </motion.div>
 
-                {/* Sub-description */}
-                <p
-                    style={{
-                        fontFamily: "var(--font-dm)",
-                        fontSize: "13px",
-                        color: "rgba(245,237,214,0.4)",
-                        margin: "0 0 36px 0",
-                        lineHeight: 1.6,
-                    }}
-                >
-                    A dark luxury sanctuary in the heart of Sainikpuri.
-                </p>
-
-                {/* CTA Options */}
-                <div
-                    className="cta-row"
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "12px",
-                    }}
-                >
-                    <Link
-                        href="/menu"
-                        className="cta-btn"
+                    {/* Thin gold rule */}
+                    <motion.div
+                        variants={itemVariants}
                         style={{
+                            width: "48px",
+                            height: "1px",
                             background: "#C9A84C",
-                            color: "#0D0D0D",
-                            padding: "12px 28px",
-                            borderRadius: "6px",
-                            fontFamily: "var(--font-dm)",
-                            fontWeight: 600,
-                            fontSize: "11px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.15em",
-                            textDecoration: "none",
-                            transition: "background 0.25s ease",
+                            margin: "16px auto",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "#F5EDD6")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "#C9A84C")}
-                    >
-                        OUR MENU
-                    </Link>
+                    />
 
-                    <a
-                        href="#reserve"
-                        className="cta-btn"
+                    {/* Tagline */}
+                    <motion.p
+                        variants={itemVariants}
+                        className="tagline"
                         style={{
-                            background: "transparent",
-                            border: "1px solid rgba(201,168,76,0.4)",
-                            color: "#F5EDD6",
-                            padding: "12px 28px",
-                            borderRadius: "6px",
-                            fontFamily: "var(--font-dm)",
-                            fontWeight: 600,
-                            fontSize: "11px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.15em",
-                            textDecoration: "none",
-                            transition: "all 0.25s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "#C9A84C";
-                            e.currentTarget.style.color = "#C9A84C";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)";
-                            e.currentTarget.style.color = "#F5EDD6";
+                            fontFamily: "var(--font-cormorant)",
+                            fontSize: "22px",
+                            color: "rgba(245,237,214,0.7)",
+                            fontStyle: "italic",
+                            margin: "0 0 8px 0",
                         }}
                     >
-                        RESERVE A TABLE
-                    </a>
+                        Where Darkness Tastes Golden.
+                    </motion.p>
 
-                    <a
-                        href="#ambiance"
+                    {/* Sub-description */}
+                    <motion.p
+                        variants={itemVariants}
                         style={{
                             fontFamily: "var(--font-dm)",
-                            fontSize: "12px",
-                            color: "rgba(245,237,214,0.45)",
-                            textDecoration: "none",
-                            transition: "color 0.25s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.color = "#C9A84C";
-                            e.currentTarget.style.textDecoration = "underline";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.color = "rgba(245,237,214,0.45)";
-                            e.currentTarget.style.textDecoration = "none";
+                            fontSize: "13px",
+                            color: "rgba(245,237,214,0.4)",
+                            margin: "0 0 36px 0",
+                            lineHeight: 1.6,
                         }}
                     >
-                        Our Story
-                    </a>
-                </div>
+                        A dark luxury sanctuary in the heart of Sainikpuri.
+                    </motion.p>
 
-                {/* Rating Row */}
-                <div
-                    style={{
-                        borderTop: "1px solid rgba(201,168,76,0.1)",
-                        paddingTop: "20px",
-                        marginTop: "28px",
-                        textAlign: "center",
-                    }}
-                >
-                    <p
+                    {/* CTA Options */}
+                    <motion.div
+                        variants={itemVariants}
+                        className="cta-row"
                         style={{
-                            fontFamily: "var(--font-dm)",
-                            fontSize: "11px",
-                            color: "rgba(245,237,214,0.35)",
-                            margin: 0,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: "12px",
                         }}
                     >
-                        <span style={{ color: "#C9A84C", marginRight: "6px" }}>★★★★★</span>
-                        4.9 · 2,000+ guests · Sainikpuri, Hyderabad
-                    </p>
-                </div>
+                        <motion.div
+                            whileHover={{ scale: 1.03 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                        >
+                            <Link
+                                href="/menu"
+                                className="cta-btn"
+                                style={{
+                                    display: "block",
+                                    background: "#C9A84C",
+                                    color: "#0D0D0D",
+                                    padding: "12px 28px",
+                                    borderRadius: "6px",
+                                    fontFamily: "var(--font-dm)",
+                                    fontWeight: 600,
+                                    fontSize: "11px",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.15em",
+                                    textDecoration: "none",
+                                    transition: "background 0.25s ease",
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = "#F5EDD6")}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = "#C9A84C")}
+                            >
+                                OUR MENU
+                            </Link>
+                        </motion.div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.03 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                        >
+                            <a
+                                href="#reserve"
+                                className="cta-btn"
+                                style={{
+                                    display: "block",
+                                    background: "transparent",
+                                    border: "1px solid rgba(201,168,76,0.4)",
+                                    color: "#F5EDD6",
+                                    padding: "12px 28px",
+                                    borderRadius: "6px",
+                                    fontFamily: "var(--font-dm)",
+                                    fontWeight: 600,
+                                    fontSize: "11px",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.15em",
+                                    textDecoration: "none",
+                                    transition: "all 0.25s ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = "#C9A84C";
+                                    e.currentTarget.style.color = "#C9A84C";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)";
+                                    e.currentTarget.style.color = "#F5EDD6";
+                                }}
+                            >
+                                RESERVE A TABLE
+                            </a>
+                        </motion.div>
+
+                        <a
+                            href="#ambiance"
+                            style={{
+                                fontFamily: "var(--font-dm)",
+                                fontSize: "12px",
+                                color: "rgba(245,237,214,0.45)",
+                                textDecoration: "none",
+                                transition: "color 0.25s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = "#C9A84C";
+                                e.currentTarget.style.textDecoration = "underline";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.color = "rgba(245,237,214,0.45)";
+                                e.currentTarget.style.textDecoration = "none";
+                            }}
+                        >
+                            Our Story
+                        </a>
+                    </motion.div>
+
+                    {/* Rating Row */}
+                    <motion.div
+                        variants={itemVariants}
+                        style={{
+                            borderTop: "1px solid rgba(201,168,76,0.1)",
+                            paddingTop: "20px",
+                            marginTop: "28px",
+                            textAlign: "center",
+                        }}
+                    >
+                        <p
+                            style={{
+                                fontFamily: "var(--font-dm)",
+                                fontSize: "11px",
+                                color: "rgba(245,237,214,0.35)",
+                                margin: 0,
+                            }}
+                        >
+                            <span style={{ color: "#C9A84C", marginRight: "6px" }}>★★★★★</span>
+                            4.9 · 2,000+ guests · Sainikpuri, Hyderabad
+                        </p>
+                    </motion.div>
+                </motion.div>
             </motion.div>
 
             {/* RIGHT FLOATING PHOTO STACK */}
             <motion.div
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
+                initial={{ opacity: 0, x: 40, y: "-50%" }}
+                animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: ["-48%", "-52%", "-48%"]
+                }}
+                transition={{
+                    opacity: { duration: 1.2, delay: 1 },
+                    x: { duration: 1.2, delay: 1 },
+                    y: { duration: 14, repeat: Infinity, ease: "easeInOut" }
+                }}
                 className="floating-photo"
                 style={{
                     position: "absolute",
@@ -271,10 +342,13 @@ export default function HeroSection() {
                     flexDirection: "column",
                     gap: "12px",
                     zIndex: 5,
+                    willChange: "transform"
                 }}
             >
                 {/* Photo 1 (top) */}
-                <div
+                <motion.div
+                    animate={{ rotate: [3, 4, 3] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                     style={{
                         width: "200px",
                         height: "200px",
@@ -292,10 +366,12 @@ export default function HeroSection() {
                         alt="Signature Dish"
                         onError={(e) => { (e.currentTarget as any).style.display = 'none'; }}
                     />
-                </div>
+                </motion.div>
 
                 {/* Photo 2 (bottom) */}
-                <div
+                <motion.div
+                    animate={{ rotate: [-2, -3, -2] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
                     style={{
                         width: "200px",
                         height: "160px",
@@ -314,11 +390,14 @@ export default function HeroSection() {
                         alt="Venue Entrance"
                         onError={(e) => { (e.currentTarget as any).style.display = 'none'; }}
                     />
-                </div>
+                </motion.div>
             </motion.div>
 
             {/* NON-ALCOHOLIC BADGE */}
-            <div
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5, duration: 1 }}
                 style={{
                     position: "absolute",
                     bottom: "28px",
@@ -342,7 +421,7 @@ export default function HeroSection() {
                 >
                     100% NON-ALCOHOLIC
                 </p>
-            </div>
+            </motion.div>
 
             {/* SCROLL INDICATOR */}
             <AnimatePresence>
@@ -388,6 +467,7 @@ export default function HeroSection() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </section>
+        </motion.section>
     );
 }
+
